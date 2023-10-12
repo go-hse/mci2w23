@@ -84,6 +84,8 @@ window.onload = () => {
         const tickSize = 10;
         const delta = Math.PI / 30;
         const sec = now.getSeconds();
+        const min = now.getMinutes() + sec / 60;
+        const hrs = now.getHours() + min / 60;
         {
             // Uhr
             ctx.translate(600, 400);
@@ -95,9 +97,29 @@ window.onload = () => {
                     line(ctx, radius, 0, radius + tickSize, 0);
                 }
                 ctx.rotate(delta);
-            }
 
+            }
             ctx.resetTransform();
+            // Hours
+            ctx.translate(600, 400);
+            ctx.rotate((hrs - 3) * delta * 5);
+            line(ctx, 0, 0, radius * 0.6, 0, "#000", 5);
+            ctx.resetTransform();
+            // Minutes 
+            ctx.translate(600, 400);
+            ctx.rotate(min * delta);
+
+            // Senkrechte Linie nach Oben
+            line(ctx, 0, 0, 0, -radius * 0.8, "#000", 3);
+            ctx.resetTransform();
+            // Seconds
+            ctx.translate(600, 400);
+            ctx.rotate((sec - 15) * delta);
+
+            // Waagerechte Linie nach rchts
+            line(ctx, 0, 0, radius, 0, "#f00");
+            ctx.resetTransform();
+
         }
 
 
