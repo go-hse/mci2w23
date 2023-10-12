@@ -55,8 +55,18 @@ window.onload = () => {
         for (let c of circles) {
             const x = offset + c.x * size;
             const y = offset + c.y * size;
-            const d = cl.distance(x, y, mouseX, mouseY);
-            const color = d < radius ? "#fff" : "#0af";
+            let color = "#fff";
+            for (let f in fingers) {
+                if (fingers[f]) {
+                    const finger = fingers[f];
+                    const d = cl.distance(x, y, finger.x, finger.y);
+                    if (d < radius) {
+                        color = "#0af";
+                        break;
+                    }
+                }
+            }
+
             cl.circle(ctx, x, y, radius, color);
         }
 
