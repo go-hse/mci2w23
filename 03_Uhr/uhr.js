@@ -16,6 +16,20 @@ function line(ctx, x1, y1, x2, y2, strokeStyle = "#000", lineWidth = 1) {
     ctx.stroke();
 }
 
+function cross(ctx, x, y, size = 10, strokeStyle = "#000", lineWidth = 1) {
+    ctx.lineWidth = lineWidth;
+    ctx.strokeStyle = strokeStyle;
+    ctx.beginPath();
+    ctx.moveTo(x - size, y);
+    ctx.lineTo(x + size, y);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x, y - size);
+    ctx.lineTo(x, y + size);
+    ctx.stroke();
+}
+
+
 window.onload = () => {
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
@@ -38,10 +52,54 @@ window.onload = () => {
         const deltaTime = (now - startTime) / 1000; // Zeit ab Start in Sekunden
         {
             ctx.translate(200, 200);
+            cross(ctx, 0, 0);
             ctx.rotate(deltaTime);
-            rect(ctx, 0, 0, size, 2 * size, "#f00");
+            rect(ctx, 0, 0, size, 2 * size, "#ff0");
             ctx.resetTransform();
         }
+
+        {
+            ctx.translate(400, 200);
+            ctx.save();
+            ctx.rotate(deltaTime);
+            ctx.translate(-size / 2, -size);
+            rect(ctx, 0, 0, size, 2 * size, "#ff0");
+            ctx.restore();
+            cross(ctx, 0, 0);
+            ctx.resetTransform();
+        }
+
+        {
+            ctx.translate(600, 200);
+            ctx.rotate(deltaTime);
+            ctx.translate(size / 2, size);
+            rect(ctx, 0, 0, size, 2 * size, "#ff0");
+            ctx.resetTransform();
+            ctx.translate(600, 200);
+            cross(ctx, 0, 0);
+            ctx.resetTransform();
+        }
+
+        const radius = 100;
+        const tickSize = 10;
+        const delta = Math.PI / 30;
+        const sec = now.getSeconds();
+        {
+            // Uhr
+            ctx.translate(600, 400);
+            cross(ctx, 0, 0);
+            for (let i = 0; i < 60; ++i) {
+                if (i % 5 === 0) {
+                    line(ctx, radius - tickSize, 0, radius + tickSize, 0);
+                } else {
+                    line(ctx, radius, 0, radius + tickSize, 0);
+                }
+                ctx.rotate(delta);
+            }
+
+            ctx.resetTransform();
+        }
+
 
         window.requestAnimationFrame(draw);
     }
