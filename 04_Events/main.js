@@ -16,13 +16,12 @@ window.onload = () => {
 
         const now = new Date();
         const deltaTime = (now - startTime) / 1000; // Zeit ab Start in Sekunden
-        {
-            ctx.translate(mouseX, mouseY);
-            cl.cross(ctx, 0, 0);
-            ctx.rotate(deltaTime);
-            cl.rect(ctx, 0, 0, size, 2 * size, "#ff0");
-            ctx.resetTransform();
-        }
+        ctx.translate(mouseX, mouseY);
+        cl.cross(ctx, 0, 0);
+        ctx.rotate(deltaTime);
+        cl.rect(ctx, 0, 0, size, 2 * size, "#ff0");
+        cl.circle(ctx, 0, 0, 30, "#f00");
+        ctx.resetTransform();
 
         window.requestAnimationFrame(draw);
     }

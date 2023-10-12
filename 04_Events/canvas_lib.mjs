@@ -28,6 +28,9 @@ export function cross(ctx, x, y, size = 10, strokeStyle = "#000", lineWidth = 1)
     ctx.stroke();
 }
 
+const startAngle = 0;
+const endAngle = Math.PI * 2;
+
 export function circle(ctx, x, y, radius, fillStyle = "#fff", strokeStyle = "#000", lineWidth = 1) {
     ctx.fillStyle = fillStyle;
     ctx.lineWidth = lineWidth;
@@ -37,8 +40,6 @@ export function circle(ctx, x, y, radius, fillStyle = "#fff", strokeStyle = "#00
     ctx.fill();
     ctx.stroke();
 }
-
-
 
 export function initCanvas(id) {
     const canvas = document.getElementById(id);
