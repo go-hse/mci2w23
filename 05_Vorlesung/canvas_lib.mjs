@@ -42,6 +42,32 @@ export function circle(ctx, x, y, radius, fillStyle = "#fff", strokeStyle = "#00
 }
 
 
+function u_path() {
+    let upath = new Path2D();
+    upath.moveTo(-2, -2);
+    upath.lineTo(-2, 2);
+    upath.lineTo(-1, 2);
+    upath.lineTo(-1, -1);
+    upath.lineTo(1, -1);
+    upath.lineTo(1, 2);
+    upath.lineTo(2, 2);
+    upath.lineTo(2, -2);
+    upath.closePath();
+    return upath;
+}
+function path(ctx, p, x, y, sc = 1, fillStyle = "#fff", strokeStyle = "#000", lineWidth = 1) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(sc, sc);
+    ctx.fillStyle = fillStyle;
+    ctx.lineWidth = lineWidth;
+    ctx.strokeStyle = strokeStyle;
+    ctx.fill(p);
+    ctx.stroke(p);
+    ctx.restore();
+}
+
+
 export function distance(x1, y1, x2, y2) {
     const dx = x2 - x1;
     const dy = y2 - y1;
