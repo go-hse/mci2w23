@@ -1,25 +1,5 @@
 import * as cl from "./canvas_lib.mjs";
 
-const radius = 50;
-
-function create_button(ctx, x, y, options) {
-
-    let inside = false;
-    function draw() {
-        if (inside) {
-            cl.circle(ctx, x, y, radius, options.touched);
-        } else {
-            cl.circle(ctx, x, y, radius, options.color);
-        }
-    }
-
-    function isInside(tx, ty) {
-        inside = cl.distance(x, y, tx, ty) < radius;
-        if (inside) options.callback();
-    }
-
-    return { draw, isInside };
-}
 
 
 window.onload = () => {
@@ -28,22 +8,29 @@ window.onload = () => {
 
     let interactiveObjects = [], strokeStyle = "#000", points = [];
 
-    interactiveObjects.push(create_button(ctx, 100, 100, {
+    interactiveObjects.push(cl.create_button(ctx, 100, 100, {
         color: "#f00",
         touched: "#800",
         callback: function () { strokeStyle = "#f00"; }
     }));
 
-    interactiveObjects.push(create_button(ctx, 200, 100, {
+    interactiveObjects.push(cl.create_button(ctx, 200, 100, {
         color: "#0f0",
         touched: "#080",
         callback: function () { strokeStyle = "#0f0"; }
     }));
 
-    interactiveObjects.push(create_button(ctx, 300, 100, {
+    interactiveObjects.push(cl.create_button(ctx, 300, 100, {
         color: "#222",
         touched: "#aaa",
         callback: function () { points = []; }
+    }));
+
+
+    interactiveObjects.push(cl.create_u(ctx, 100, 300, Math.PI / 2, {
+        color: "#f22",
+        touched: "#aaf",
+        callback: function () { }
     }));
 
 
@@ -66,8 +53,15 @@ window.onload = () => {
         for (let t of touches) {
             points.push({ x: t.pageX, y: t.pageY, strokeStyle, isStart })
 
-            for (let o of interactiveObjects) {
-                o.isInside(t.pageX, t.pageY);
+            if (isStart) {
+                for (let o of interactiveObjects) {
+                    o.isInside(t.pageX, t.pageY, t.identifier);
+                }
+            } else {
+                for (let o of interactiveObjects) {
+                    o.move(t.pageX, t.pageY, t.identifier);
+                }
+
             }
             fingers[t.identifier] = {
                 x: t.pageX,
@@ -78,6 +72,9 @@ window.onload = () => {
     function rmFingers(touches) {
         for (let t of touches) {
             fingers[t.identifier] = undefined
+            for (let o of interactiveObjects) {
+                o.reset(t.identifier);
+            }
         }
     }
 
@@ -114,23 +111,6 @@ window.onload = () => {
         }
         ctx.stroke();
 
-        // for (let c of circles) {
-        //     const x = offset + c.x * size;
-        //     const y = offset + c.y * size;
-        //     let color = "#fff";
-        //     for (let f in fingers) {
-        //         if (fingers[f]) {
-        //             const finger = fingers[f];
-        //             const d = cl.distance(x, y, finger.x, finger.y);
-        //             if (d < radius) {
-        //                 color = "#0af";
-        //                 break;
-        //             }
-        //         }
-        //     }
-
-        //     cl.circle(ctx, x, y, radius, color);
-        // }
 
         for (let f in fingers) {
             if (fingers[f]) {
