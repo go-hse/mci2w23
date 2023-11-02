@@ -3,10 +3,85 @@ import * as funktionModul from "./js/funcs.mjs";
 funktionModul.test();
 
 
+// https://hs-esslingen.webex.com/meet/andreas.roessler
+
 function onload() {
 }
 
+function any(o) {
+    let i = o + 1;
+}
+
+function outer(i) {
+    let _i = i, name = "object";
+
+
+    function privFunction() {
+        _i *= 2;
+    }
+
+    function inner() {
+        privFunction();
+        return ++_i;
+    }
+    return inner;
+}
+
+
+function Tier(n) {
+    let name = n;
+
+    function getName() {
+        return name;
+    }
+
+    return getName;
+}
+
+
+function Saeuger(n, g) {
+    let gewicht = g;
+    let base = Tier(n);
+
+    function eat(g) {
+        gewicht += g;
+    }
+
+
+    return { eat, base };
+}
+
+
+
+
+
+
+
+function outerWithObject(i) {
+    let that = {
+        i: i,
+        f: function () { ++i }
+    };
+    return that;
+}
+
+
+
+
+
 window.onload = () => {
+    let counterFunction = outer(15);
+    let o = outerWithObject();
+    o.i += 13;
+    o.f();
+
+    let counterFunction2 = outer(27);
+    console.log("counterFunction", counterFunction());
+    console.log("counterFunction", counterFunction());
+    console.log("counterFunction", counterFunction());
+    console.log("counterFunction2", counterFunction2());
+
+
     let arr = [1, 2, 3, 4, 5];
     console.log(typeof arr, Array.isArray(arr), arr.length);
     arr.push(5);
