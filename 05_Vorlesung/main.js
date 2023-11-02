@@ -33,6 +33,11 @@ window.onload = () => {
         callback: function () { }
     }));
 
+    interactiveObjects.push(cl.create_u_rot_two_fingers(ctx, 200, 300, Math.PI / 2, {
+        color: "#22f",
+        touched: "#afa",
+        callback: function () { }
+    }));
 
     canvas.addEventListener("touchstart", (evt) => {
         evt.preventDefault();
@@ -93,9 +98,6 @@ window.onload = () => {
         ctx.resetTransform();
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        for (const o of interactiveObjects) {
-            o.draw();
-        }
 
         ctx.lineWidth = 5;
         ctx.beginPath();
@@ -111,6 +113,9 @@ window.onload = () => {
         }
         ctx.stroke();
 
+        for (const o of interactiveObjects) {
+            o.draw();
+        }
 
         for (let f in fingers) {
             if (fingers[f]) {

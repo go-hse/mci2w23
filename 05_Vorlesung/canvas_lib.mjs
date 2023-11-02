@@ -144,9 +144,6 @@ export function create_u(ctx, x, y, alpha, options) {
         const Tl = I.transformPoint(new DOMPoint(tx, ty));  // ins UrsprungsKS des Pfade transf. TP
         inside = ctx.isPointInPath(the_drawing_path, Tl.x, Tl.y);
         if (inside) {
-            // P = getTransform(ctx, tx, ty); // Ti
-            // P.invertSelf(); // Ti-1
-            // P.multiplySelf(L); //
             P = getTransform(ctx, tx, ty).invertSelf().multiplySelf(L); // Ti-1 Li
             options.callback();
             touchId = id;
@@ -158,7 +155,6 @@ export function create_u(ctx, x, y, alpha, options) {
             console.log("move", id);
             L = getTransform(ctx, tx, ty).multiplySelf(P);
         }
-
     }
 
     // wenn Finger loslassen, prüfen, ob Finger für Interaktion verantw. war.
@@ -166,9 +162,74 @@ export function create_u(ctx, x, y, alpha, options) {
         if (id === touchId) {
             touchId = undefined;
         }
+    }
+    return { draw, isInside, move, reset };
+}
 
+
+export function create_u_rot_two_fingers(ctx, x, y, alpha, options) {
+    const the_drawing_path = u_path();
+    let L = getTransform(ctx, x, y, alpha, 20); // LKS des zu greifenden Obj.
+
+    let inside = false, P, touchId, secondId, x1, y1, x2, y2;
+
+    function draw() {
+        if (inside) {
+            fillPath(ctx, the_drawing_path, L, options.touched);
+        } else {
+            fillPath(ctx, the_drawing_path, L, options.color);
+        }
     }
 
+    function isInside(tx, ty, id) {
+        if (touchId === undefined) {
+            const I = (new DOMMatrix(L)).invertSelf();
+            const Tl = I.transformPoint(new DOMPoint(tx, ty));  // ins UrsprungsKS des Pfade transf. TP
+            inside = ctx.isPointInPath(the_drawing_path, Tl.x, Tl.y);
+            if (inside) {
+                P = getTransform(ctx, tx, ty).invertSelf().multiplySelf(L); // Ti-1 Li
+                options.callback();
+                touchId = id;
+                x1 = tx; y1 = ty;
+            }
+        } else {  // 1. Finger präsent
+            if (secondId === undefined) {
+                secondId = id;
+                x2 = tx; y2 = ty;
+                const beta = Math.atan2(y1 - y2, x1 - x2);
+                P = getTransform(ctx, x1, y1, beta).invertSelf().multiplySelf(L); // Ti-1 Li
 
+            }
+        }
+    }
+
+    function move(tx, ty, id) {
+        if (id === secondId) {
+            x2 = tx; y2 = ty;
+        } else if (id === touchId) {
+            x1 = tx; y1 = ty;
+        }
+
+        if (touchId !== undefined && secondId === undefined) {
+            // nur der erste Finger berührt Objekt
+            L = getTransform(ctx, x1, y1).multiplySelf(P);
+        } else if (touchId !== undefined && secondId !== undefined) {
+            // erster Finger berührt Objekt; 2. Finger berührt Oberfläche
+            const beta = Math.atan2(y1 - y2, x1 - x2);
+            // L: KS des Objekts; getTransform berechnet Tn; Ln = Tn * P (P = Ti-1 * Li);
+            L = getTransform(ctx, x1, y1, beta).multiplySelf(P);
+        }
+    }
+
+    // wenn Finger loslassen, prüfen, ob Finger für Interaktion verantw. war.
+    function reset(id) {
+        if (id === touchId) {
+            touchId = undefined;
+        }
+        if (id === secondId) {
+            secondId = undefined;
+            P = getTransform(ctx, x1, y1).invertSelf().multiplySelf(L); // Ti-1 Li
+        }
+    }
     return { draw, isInside, move, reset };
 }
