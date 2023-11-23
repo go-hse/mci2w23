@@ -45,9 +45,45 @@ window.onload = function () {
     const cursor = add(1, scene);
     let mouseButtons = [false, false, false, false];
 
+    const ballArray = [];
+    let ballIdx = 0, currentBall;
+    for (let i = 0; i < 10; ++i) {
+        const mesh = add(3, scene);
+        mesh.scale.set(0.1, 0.1, 0.1);
+        ballArray.push({ active: false, mesh });
+    }
+
+    let position = new THREE.Vector3();
+    let rotation = new THREE.Quaternion();
+    let scale = new THREE.Vector3();
+    let direction = new THREE.Vector3();
+
+
+    function shootBall() {
+        cursor.updateMatrix();
+        // Zerlegung der Matrix des Cursors in Translation, Rotation und Skalierung
+        cursor.matrix.decompose(position, rotation, scale);
+        // Richtung nach oben - wie Cursor Ausgangsrichtung
+        direction.set(0, 1, 0);
+        // Anwendung der CursorRotation auf Richtung
+        direction.applyQuaternion(rotation);
+        console.log(direction);
+
+        currentBall = ballArray[ballIdx++];
+        if (ballIdx >= ballArray.length) ballIdx = 0;
+        currentBall.active = true;
+        currentBall.mesh.position.x = cursor.position.x;
+        currentBall.mesh.position.y = cursor.position.y;
+        currentBall.mesh.position.z = cursor.position.z;
+        currentBall.delta = { dx: direction.x * MOVESCALE, dy: direction.y * MOVESCALE, dz: direction.z * MOVESCALE };
+    }
+
     function toggle(ev, active) {
         mouseButtons[ev.which] = active;
         console.log(mouseButtons);
+        if (ev.which === 2 && active) {
+            shootBall();
+        }
     }
 
     const MOVESCALE = 0.001;
@@ -103,7 +139,13 @@ window.onload = function () {
 
     document.body.appendChild(renderer.domElement);
     function render() {
-
+        for (let ballObject of ballArray) {
+            if (ballObject.active) {
+                ballObject.mesh.position.x += ballObject.delta.dx;
+                ballObject.mesh.position.y += ballObject.delta.dy;
+                ballObject.mesh.position.z += ballObject.delta.dz;
+            }
+        }
         renderer.render(scene, camera);
     }
     renderer.setAnimationLoop(render);
