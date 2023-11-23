@@ -42,18 +42,45 @@ window.onload = function () {
         return object;
     }
 
+    const cursor = add(1, scene);
+    let mouseButtons = [false, false, false, false];
 
-    let array = [];
-    const delta = 0.4, z = -4;
-
-    let counter = 0;
-    for (let x = -1; x < 1; x += delta) {
-        for (let y = -1; y < 1; y += delta) {
-            const idx = (++counter) % geometries.length;
-            array.push(add(idx, scene, x, y, z));
-
-        }
+    function toggle(ev, active) {
+        mouseButtons[ev.which] = active;
+        console.log(mouseButtons);
     }
+
+    const MOVESCALE = 0.001;
+    function onMouseMove(event) {
+        const dx = event.movementX * MOVESCALE;
+        const dy = event.movementY * MOVESCALE;
+        const isRotation = event.ctrlKey;
+        if (!isRotation && mouseButtons[1]) {
+            cursor.position.x += dx;
+            cursor.position.z += dy;
+        }
+        if (!isRotation && mouseButtons[3]) {
+            cursor.position.x += dx;
+            cursor.position.y += -dy;
+        }
+
+        if (isRotation && mouseButtons[1]) {
+            cursor.rotation.x += dy;
+            cursor.rotation.z += dx;
+        }
+
+    }
+
+    document.addEventListener('mousemove', onMouseMove);
+
+    document.addEventListener('mousedown', ev => toggle(ev, true));
+    document.addEventListener('mouseup', ev => toggle(ev, false));
+    document.addEventListener('contextmenu', ev => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        return false;
+    });
+
 
     const groundGeo = new THREE.PlaneGeometry(20, 20, 64);
     const groundMat = new THREE.MeshStandardMaterial({ color: 0xffffff, side: THREE.DoubleSide });
@@ -76,10 +103,7 @@ window.onload = function () {
 
     document.body.appendChild(renderer.domElement);
     function render() {
-        for (let o of array) {
-            o.rotation.x += 0.04;
-            o.rotation.z += 0.01;
-        }
+
         renderer.render(scene, camera);
     }
     renderer.setAnimationLoop(render);
