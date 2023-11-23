@@ -59,6 +59,37 @@ window.onload = function () {
     let direction = new THREE.Vector3();
 
 
+    function keyboard() {
+        let keys = {};
+
+        function toggle(event, active) {
+            if (keys[event.key]) {
+                let ko = keys[event.key];
+                if (ko.active !== active) {
+                    ko.active = active;
+                    ko.callback(active);
+                }
+            } else {
+                console.log("undefined key", event.key);
+            }
+        }
+
+        document.addEventListener("keydown", (ev) => toggle(ev, true));
+        document.addEventListener("keyup", (ev) => toggle(ev, false));
+
+        return function (key, callback) {
+            keys[key] = {
+                active: false,
+                callback
+            }
+        }
+    }
+
+    const addKey = keyboard();
+    addKey("Escape", active => {
+        console.log("Escape", active);
+    })
+
     function shootBall() {
         cursor.updateMatrix();
         // Zerlegung der Matrix des Cursors in Translation, Rotation und Skalierung
